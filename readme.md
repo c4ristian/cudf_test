@@ -16,6 +16,18 @@ python cudf_demo.py
 pytest tests/
 ```
 
+## Lint
+
+```bash
+pylint cudf_demo.py tests/test_cudf.py
+```
+
+You can also lint all Python files from the project root:
+
+```bash
+pylint *.py tests/*.py
+```
+
 ## Requirements
 
 - NVIDIA GPU with CUDA 12.x driver support

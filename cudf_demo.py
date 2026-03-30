@@ -50,7 +50,8 @@ if __name__ == "__main__":
     # Print device information and cuDF version
     print(f"cuDF version: {cudf.__version__}")
     device = cp.cuda.Device(0)
-    props = cp.cuda.runtime.getDeviceProperties(device.id)
+    # CuPy exposes CUDA runtime attributes via a C extension that pylint cannot introspect.
+    props = cp.cuda.runtime.getDeviceProperties(device.id)  # pylint: disable=c-extension-no-member
     print(f"GPU device: {props['name'].decode()}")
     print(f"Total memory: {props['totalGlobalMem'] / 1024 ** 3:.1f} GB")
     print(f"CUDA capability: {props['major']}.{props['minor']}\n")
@@ -59,4 +60,3 @@ if __name__ == "__main__":
     try_numpy_interop()
     try_filter()
     print("\nAll tests passed!")
-

@@ -33,3 +33,6 @@ pylint *.py tests/*.py
 - NVIDIA GPU with CUDA 12.x driver support
 - Driver version 520+ recommended
 
+## AI Attribution
+
+This project was generated with the assistance of [Claude Sonnet 4.5](https://www.anthropic.com/claude) by [Anthropic](https://www.anthropic.com).

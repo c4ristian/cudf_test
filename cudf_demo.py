@@ -1,5 +1,11 @@
 """Demo script to test cuDF on GPU."""
-import cudf
+import os
+
+# Use KvikIO compatible mode so cuFile/GDS is never initialised on systems
+# that do not have GPUDirect Storage installed.
+os.environ.setdefault("KVIKIO_COMPAT_MODE", "ON")
+
+import cudf  # noqa: E402 (import must come after env-var is set)
 import cupy as cp
 import numpy as np
 
@@ -46,6 +52,55 @@ def try_filter():
     print(filtered)
 
 
+def read_covid_csv(filepath):
+    """Read the COVID-19 CSV file and return a cuDF DataFrame.
+
+    Args:
+        filepath: Path to the CSV file.
+
+    Returns:
+        cuDF DataFrame with all columns from the CSV.
+    """
+    return cudf.read_csv(filepath)
+
+
+def process_covid_data(df):
+    """Aggregate COVID-19 data by continent.
+
+    Drops rows without a continent, fills missing numeric values with 0,
+    then sums new_cases and new_deaths per continent, sorted by new_cases
+    in descending order.
+
+    Args:
+        df: cuDF DataFrame as returned by read_covid_csv.
+
+    Returns:
+        cuDF DataFrame with columns continent, new_cases, new_deaths.
+    """
+    df = df.dropna(subset=["continent"])
+    df["new_cases"] = df["new_cases"].fillna(0)
+    df["new_deaths"] = df["new_deaths"].fillna(0)
+
+    aggregated = (
+        df.groupby("continent")[["new_cases", "new_deaths"]]
+        .sum()
+        .reset_index()
+        .sort_values("new_cases", ascending=False)
+    )
+    return aggregated
+
+
+def try_read_csv():
+    """Read and process the COVID-19 CSV file, then print a summary."""
+    filepath = os.path.join(os.path.dirname(__file__), "data", "covid_data.csv")
+    df = read_covid_csv(filepath)
+    print(f"\nCOVID-19 CSV loaded: {len(df):,} rows, {len(df.columns)} columns")
+
+    summary = process_covid_data(df)
+    print("\nTotal new cases and deaths by continent:")
+    print(summary.to_pandas().to_string(index=False))
+
+
 if __name__ == "__main__":
     # Print device information and cuDF version
     print(f"cuDF version: {cudf.__version__}")
@@ -59,4 +114,5 @@ if __name__ == "__main__":
     try_dataframe()
     try_numpy_interop()
     try_filter()
-    print("\nAll tests passed!")
+    try_read_csv()
+    print("\nDemo successful!")

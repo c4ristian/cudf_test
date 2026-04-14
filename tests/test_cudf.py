@@ -79,4 +79,3 @@ def test_process_covid_data():
     assert expected_continents == result_continents
     assert (summary["new_cases"] >= 0).all()
     assert (summary["new_deaths"] >= 0).all()
-

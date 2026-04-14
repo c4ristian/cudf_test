@@ -5,11 +5,13 @@ import os
 # that do not have GPUDirect Storage installed.
 os.environ.setdefault("KVIKIO_COMPAT_MODE", "ON")
 
-import cudf  # noqa: E402 (import must come after env-var is set)
+# pylint: disable=wrong-import-position
+# Reason: KVIKIO_COMPAT_MODE must be set before cudf/cupy/numpy are imported
+# because KvikIO reads the variable at import time to decide whether to use cuFile.
+import cudf
 import cupy as cp
 import numpy as np
-
-
+# pylint: enable=wrong-import-position
 def try_series():
     """Test basic cuDF Series operations."""
     s = cudf.Series([1, 2, 3, 4, 5])

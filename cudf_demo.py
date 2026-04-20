@@ -12,6 +12,8 @@ import cudf
 import cupy as cp
 import numpy as np
 # pylint: enable=wrong-import-position
+
+
 def try_series():
     """Test basic cuDF Series operations."""
     s = cudf.Series([1, 2, 3, 4, 5])
